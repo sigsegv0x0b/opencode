@@ -54,6 +54,7 @@ const cached = path.join(scriptDir, ".opencode")
 const platformMap = {
   darwin: "darwin",
   linux: "linux",
+  android: "linux",
   win32: "windows",
 }
 const archMap = {

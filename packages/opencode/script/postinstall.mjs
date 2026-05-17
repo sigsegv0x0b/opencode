@@ -14,6 +14,7 @@ const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "package.jso
 const platformMap = {
   darwin: "darwin",
   linux: "linux",
+  android: "linux",
   win32: "windows",
 }
 const archMap = {
@@ -153,6 +154,14 @@ function copyBinary(source, target) {
     fs.copyFileSync(source, target)
   }
   fs.chmodSync(target, 0o755)
+
+  if (os.platform() === "android") {
+    try {
+      childProcess.execSync(`patchelf --set-interpreter /system/bin/linker64 "${target}"`, { stdio: "pipe" })
+    } catch {
+      console.error("Failed to patch binary for Android. Do you have patchelf installed? (pkg install patchelf)")
+    }
+  }
 }
 
 function verifyBinary() {
