@@ -11,7 +11,7 @@ if (!expectedBunVersion) {
 }
 const expectedBunVersionRange = `^${expectedBunVersion}`;
 if (!semver.satisfies(process.versions.bun, expectedBunVersionRange)) {
-  console.warn(`Warning: bun@${expectedBunVersionRange} expected, but you are using bun@${process.versions.bun} — proceeding anyway`);
+  throw new Error(`This script requires bun@${expectedBunVersionRange}, but you are using bun@${process.versions.bun}`);
 }
 if (process.versions.bun !== expectedBunVersion) {
   console.warn(`Warning: Bun version ${process.versions.bun} differs from expected ${expectedBunVersion}`);
