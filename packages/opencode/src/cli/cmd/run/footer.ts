@@ -65,6 +65,7 @@ type CycleResult = {
   status?: string
   variant?: string | undefined
   variants?: string[]
+  usage?: string
 }
 
 type RunFooterOptions = {
@@ -243,6 +244,7 @@ export class RunFooter implements FooterApi {
       model: options.modelLabel,
       duration: "",
       usage: "",
+      usageTotal: 0,
       first: options.first,
       interrupt: 0,
       exit: 0,
@@ -490,6 +492,7 @@ export class RunFooter implements FooterApi {
       model: typeof next.model === "string" ? next.model : prev.model,
       duration: typeof next.duration === "string" ? next.duration : prev.duration,
       usage: typeof next.usage === "string" ? next.usage : prev.usage,
+      usageTotal: typeof next.usageTotal === "number" ? next.usageTotal : prev.usageTotal,
       first: typeof next.first === "boolean" ? next.first : prev.first,
       interrupt:
         typeof next.interrupt === "number" && Number.isFinite(next.interrupt)
@@ -853,9 +856,11 @@ export class RunFooter implements FooterApi {
           patch.model = result.modelLabel
         }
 
-        if (patch.model) {
-          this.patch(patch)
+        if ("usage" in result) {
+          patch.usage = result.usage ?? ""
         }
+
+        this.patch(patch)
         if (result.status) {
           this.setNotice(result.status)
         }

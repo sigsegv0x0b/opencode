@@ -87,6 +87,7 @@ export type FooterState = {
   model: string
   duration: string
   usage: string
+  usageTotal: number
   first: boolean
   interrupt: number
   exit: number

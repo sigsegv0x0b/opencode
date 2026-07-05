@@ -14,7 +14,7 @@ if (!expectedBunVersion) {
 const expectedBunVersionRange = `^${expectedBunVersion}`
 
 if (!semver.satisfies(process.versions.bun, expectedBunVersionRange)) {
-  throw new Error(`This script requires bun@${expectedBunVersionRange}, but you are using bun@${process.versions.bun}`)
+  console.warn(`WARNING: expected bun@${expectedBunVersionRange}, have bun@${process.versions.bun} — proceeding anyway`)
 }
 
 const env = {

@@ -843,6 +843,13 @@ export function reduceSessionData(input: SessionDataInput): SessionDataOutput {
       next = { status: "assistant responding" }
     }
 
+    const usageTotal =
+      (info.tokens?.input ?? 0) +
+      (info.tokens?.output ?? 0) +
+      (info.tokens?.reasoning ?? 0) +
+      (info.tokens?.cache?.read ?? 0) +
+      (info.tokens?.cache?.write ?? 0)
+
     const usage = formatUsage(
       info.tokens,
       input.limits[modelKey(info.providerID, info.modelID)],
@@ -852,6 +859,7 @@ export function reduceSessionData(input: SessionDataInput): SessionDataOutput {
       next = {
         ...next,
         usage,
+        usageTotal,
       }
     }
 

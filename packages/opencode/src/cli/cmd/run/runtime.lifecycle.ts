@@ -44,6 +44,7 @@ type CycleResult = {
   status?: string
   variant?: string | undefined
   variants?: string[]
+  usage?: string
 }
 
 type FooterLabels = {

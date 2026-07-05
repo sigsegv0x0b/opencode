@@ -123,6 +123,7 @@ type RuntimeState = {
   providers: RunProvider[]
   variants: string[]
   limits: Record<string, number>
+  lastUsageTotal: number
   activeVariant: string | undefined
   sessionID: string
   history: RunPrompt[]
@@ -150,6 +151,14 @@ function variantsFor(providers: RunProvider[], model: RunInput["model"]) {
   }
 
   return Object.keys(providers.find((item) => item.id === model.providerID)?.models?.[model.modelID]?.variants ?? {})
+}
+
+const _nf = new Intl.NumberFormat("en-US")
+
+function calcUsage(totalTokens: number, limit: number | undefined): string | undefined {
+  if (totalTokens <= 0) return undefined
+  if (limit && limit > 0) return `${_nf.format(totalTokens)} (${Math.round((totalTokens / limit) * 100)}%)`
+  return _nf.format(totalTokens)
 }
 
 const RESIZE_DELAY = 250
@@ -201,6 +210,7 @@ async function runInteractiveRuntime(input: RunRuntimeInput, deps: RunRuntimeDep
     providers: [],
     variants: [],
     limits: {},
+    lastUsageTotal: 0,
     activeVariant: resolveVariant(ctx.variant, session.variant, savedVariant, []),
     sessionID: ctx.sessionID,
     history: [...session.history],
@@ -308,9 +318,12 @@ async function runInteractiveRuntime(input: RunRuntimeInput, deps: RunRuntimeDep
         return
       }
 
+      const usage = calcUsage(state.lastUsageTotal, state.limits[`${model.providerID}/${model.modelID}`])
+
       return {
         modelLabel: formatModelLabel(model, state.activeVariant, state.providers),
         status: `model ${model.modelID}`,
+        usage,
         variant: state.activeVariant,
         variants: state.variants,
       }
@@ -482,6 +495,9 @@ async function runInteractiveRuntime(input: RunRuntimeInput, deps: RunRuntimeDep
         limits: () => state.limits,
         providers: () => state.providers,
         footer,
+        onUsage: (tokens) => {
+          state.lastUsageTotal = tokens
+        },
         trace: log,
       })
       if (footer.isClosed) {

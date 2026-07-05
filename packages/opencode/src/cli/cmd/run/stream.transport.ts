@@ -76,6 +76,7 @@ type StreamInput = {
   limits: () => Record<string, number>
   providers?: () => RunProvider[]
   footer: FooterApi
+  onUsage?: (tokens: number) => void
   trace?: Trace
   signal?: AbortSignal
 }
@@ -903,6 +904,10 @@ function createLayer(input: StreamInput) {
             limits: input.limits(),
           })
           state.data = next.data
+          if (next.footer?.patch && typeof next.footer.patch.usageTotal === "number") {
+            input.onUsage?.(next.footer.patch.usageTotal)
+          }
+
           const visible = next.commits.at(-1)
           if (visible) {
             state.wait?.onVisibleOutput?.({
